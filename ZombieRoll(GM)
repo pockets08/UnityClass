@@ -1,0 +1,83 @@
+using UnityEngine; // allows programming to use Unity engine.
+using System.Collections; // Allows use of system keywords that dont exist in standard C# but only unity as shortcodes.
+using System.Collections.Generic; // Allows additional shortcodes from unity.
+using UnityEngine.UI; // Allows the use of the UI for the engine
+
+public class GameManager : MonoBehaviour { // Name of the script is GameManager, and it pulls interactions from the engine MonoBehavior (Unity C#)
+
+	// public for setting up variables and objects within the unity interface, as well make the variable adjustable in code. Private makes the code non-adjustable unless called for and removes it from unity editor as a variable to adjust.
+
+	public GameObject selectedZombie; // Zombie that is currently selected
+	public Text scoreText; //Score screen text on canvas
+	private int score = 0; //Default scoring
+	public List<GameObject> zombies; // List of game objects that contain zombies, 0-3.
+	public Vector3 selectedSize; // Size of a zombie when selected
+	public Vector3 defaultSize; // Size of a zombie when unselected
+	private int selectedZombiePosition = 0; // Position of the zombie when selected
+
+	// Use this for initialization
+	// void starts the function, and then ends it
+	void Start () {
+		SelectZombie (selectedZombie); // When game starts, the Selected zombie is the default selected zombie object. Which should be the orange zombie. (Or green if you’re Ivan)
+		scoreText.text = "Score: " + score; // This starts the game and adds the current score which is 0 to start. So “Score” is the text, followed by adding +score the function below. This then displays “Score 1” if you get a point. 
+	}
+	
+	// Update is called once per frame
+	void Update () {
+
+    // All of these functions call another function if a key is pressed. L, R, U, and then cause the zombie to react. R, L, change selected zombie, and U adds force to the zombie.
+		if (Input.GetKeyDown ("left")) {
+			GetZombieLeft ();
+		}
+
+		if (Input.GetKeyDown ("right")) {
+			GetZombieRight ();
+		}
+
+		if (Input.GetKeyDown ("up")) {
+			PushUp ();
+		}
+
+		if (Input.GetKeyDown ("down")) {
+
+		}
+	}
+
+	void GetZombieLeft() { //Function name of the Left direction
+		if (selectedZombiePosition == 0) { // If the selected zombie is 0, then loop the code below.
+			selectedZombiePosition = 3; // If we press left key, and the zombie is at position 0, change it to zombie 3
+			SelectZombie (zombies [3]); //Select zombie is now the new array number max 3.
+		} else { //if this is not the case for position, simply move lower down until it is. This is the full loop.
+			selectedZombiePosition = selectedZombiePosition - 1; // goes back 1.
+			GameObject newZombie = zombies [selectedZombiePosition]; //The gameobject is now the new zombie from the array. If it was 2, its now 1. 
+			SelectZombie (newZombie); // this changes the value of selectZombie to the value of newZombie so that the loop reads the newZombie number. 
+		}
+	}
+
+	void GetZombieRight() {//Function name of the right zombie 
+		if (selectedZombiePosition == 3) { //checks zombie pos. if in pos three and button is pressed, continue
+			SelectZombie (zombies [0]); // Select zombie becomes zombie 0
+		} else {
+			selectedZombiePosition = selectedZombiePosition + 1; //If not pos 3, add 1 to position.
+			SelectZombie (zombies [selectedZombiePosition]); // if 1 is added, new zombies become selected zombie position.
+		}
+	}
+
+	void SelectZombie(GameObject newZombie) {  // This is the function that determines what happens to a selectzombie. It states the gameobject, will change to newzombie.
+
+		selectedZombie.transform.localScale = defaultSize; //by default the selected zombie is x size
+		selectedZombie = newZombie; // the selectedZombie is the newZombie that gets created on new position.
+		newZombie.transform.localScale = selectedSize; // This changes the new zombie size, to the selected zombie size to make it bigger.
+		}
+
+	void PushUp(){// Function called for adding force to the up key on selected zombie.
+		Rigidbody rb = selectedZombie.GetComponent<Rigidbody> ();//this is a call to the component rigidbody applied to the zombie, called rb.
+		rb.AddForce (0, 0, 10, ForceMode.Impulse); // adds force in the form of an impulse to function rb. 
+	}
+
+	public void AddPoint() {// add point system to update what score equals in the start position. It starts as because no score has been made, but this function updates it.
+		score = score + 1; // score will increase by 1 each time score is called. 
+		scoreText.text = "Score: " + score; // changes the score text that was defaulted on start.
+	}
+}
+
